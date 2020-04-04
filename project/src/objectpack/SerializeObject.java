@@ -5,10 +5,6 @@ import java.io.OutputStream;
 /**
  * バイナリ変換用オブジェクト. このオブジェクトを継承して、所定のメソッド実装した場合、
  * SerializeConverterでのオブジェクトバイナリ化において、 処理速度や容量がSerializableよりも少なくなります.
- * 
- * @version 2013/12/20
- * @author masahito suzuki
- *
  */
 public interface SerializeObject {
 

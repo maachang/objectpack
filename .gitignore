@@ -1,0 +1,5 @@
+.DS_Store
+
+objectpack-*.jar
+
+project/classes

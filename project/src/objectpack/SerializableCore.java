@@ -17,13 +17,8 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
-import objectpack.reflect.FastReflect;
-
 /**
  * シリアライズコアオブジェクト.
- * 
- * @version 2013/12/19
- * @author masahito suzuki
  */
 public final class SerializableCore {
     private SerializableCore() {

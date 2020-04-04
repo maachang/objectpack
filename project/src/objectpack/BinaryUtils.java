@@ -2,10 +2,6 @@ package objectpack;
 
 /**
  * バイナリ関連処理.
- * 
- * @version 2013/11/22
- * @author masahito suzuki
- *
  */
 public class BinaryUtils {
     private BinaryUtils() {

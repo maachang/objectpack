@@ -44,13 +44,14 @@
   <!-- ===================================================================== -->
   <target name="compile">
     <mkdir dir="${dest.dir}" />
-    <javac srcdir="${src.dir}"
-           destdir="${dest.dir}"
-           encoding="UTF8"
-           debug="${debug}"
-           deprecation="${deprecation}"
-           optimize="${optimize}"
-           nowarn="${nowarn}"
+    <javac includeantruntime="false"
+            srcdir="${src.dir}"
+            destdir="${dest.dir}"
+            encoding="UTF8"
+            debug="${debug}"
+            deprecation="${deprecation}"
+            optimize="${optimize}"
+            nowarn="${nowarn}"
     >
       <classpath refid="path.lib" />
     </javac>

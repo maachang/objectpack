@@ -2,10 +2,6 @@ package objectpack;
 
 /**
  * Base64.
- * 
- * @version 2013/11/08
- * @author masahito suzuki
- *
  */
 public class Base64 {
 

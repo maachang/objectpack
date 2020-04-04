@@ -4,21 +4,15 @@ import java.io.ByteArrayInputStream;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
-import objectpack.jsnappy.JSnappy;
-import objectpack.jsnappy.JSnappyBuffer;
-
 /**
  * オブジェクトパック.
- * 
- * @version 2017/12/04
- * @author masahito suzuki
  */
 public final class ObjectPack {
     protected ObjectPack() {
     }
 
     /**
-     * オブジェクトをパック.
+     * オブジェクトをバイナリでパック.
      * 
      * @param o
      *            対象のオブジェクトを設定します.
@@ -29,9 +23,9 @@ public final class ObjectPack {
     }
 
     /**
-     * オブジェクトをアンパック.
+     * バイナリから、オブジェクトをアンパック.
      * 
-     * @parma b 対象の文字列を設定します.
+     * @param b 対象の文字列を設定します.
      * @return Object 変換されたオブジェクトが返却されます.
      */
     public static final Object unpackB(byte[] b) throws Exception {
@@ -39,7 +33,7 @@ public final class ObjectPack {
     }
 
     /**
-     * オブジェクトをパック.
+     * オブジェクトを文字列でパック.
      * 
      * @param o
      *            対象のオブジェクトを設定します.
@@ -50,9 +44,9 @@ public final class ObjectPack {
     }
 
     /**
-     * オブジェクトをアンパック.
+     * 文字列からオブジェクトをアンパック.
      * 
-     * @parma o 対象の文字列を設定します.
+     * @param o 対象の文字列を設定します.
      * @return Object 変換されたオブジェクトが返却されます.
      */
     public static final Object unpack(String o) throws Exception {
@@ -60,7 +54,7 @@ public final class ObjectPack {
     }
 
     /**
-     * オブジェクトをパック.
+     * オブジェクトをバイナリでパック.
      * 
      * @param o
      *            対象のオブジェクトを設定します.
@@ -92,9 +86,9 @@ public final class ObjectPack {
     }
 
     /**
-     * オブジェクトをアンパック.
+     * バイナリからオブジェクトをアンパック.
      * 
-     * @parma b
+     * @param b
      *            対象の文字列を設定します.
      * @param gzip
      *            [true]の場合は、GZIP圧縮、[false]の場合は、Snappy圧縮、 [null]の場合は圧縮なしで処理します.
@@ -128,7 +122,7 @@ public final class ObjectPack {
     }
 
     /**
-     * オブジェクトをパック.
+     * オブジェクトを文字列にパック.
      * 
      * @param o
      *            対象のオブジェクトを設定します.
@@ -141,9 +135,9 @@ public final class ObjectPack {
     }
 
     /**
-     * オブジェクトをアンパック.
+     * 文字列からオブジェクトをアンパック.
      * 
-     * @parma o
+     * @param o
      +            対象の文字列を設定します.
      * @param gzip
      *            [true]の場合は、GZIP圧縮、[false]の場合は、Snappy圧縮、 [null]の場合は圧縮なしで処理します.

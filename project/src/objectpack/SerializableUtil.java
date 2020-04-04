@@ -5,15 +5,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
-import objectpack.jsnappy.JSnappy;
-import objectpack.jsnappy.JSnappyBuffer;
-
 /**
  * シリアライズ用ユーティリティ.
- * 
- * @version 2013/11/24
- * @author masahito suzuki
- *
  */
 public final class SerializableUtil {
     private SerializableUtil() {

@@ -32,6 +32,14 @@ public final class SerializableCore {
 	public static final void setOriginCode(SerializableOriginCode code) {
 		ORIGIN_CODE = code;
 	}
+	
+	/**
+	 * 拡張変換処理が既に設定されているかチェック.
+	 * @return
+	 */
+	public static final boolean isOriginCode() {
+		return ORIGIN_CODE != null;
+	}
 
 	/**
 	 * オブジェクトをバイナリに変換.

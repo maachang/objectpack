@@ -22,6 +22,17 @@ import java.util.concurrent.atomic.AtomicLong;
 public final class SerializableCore {
 	private SerializableCore() {
 	}
+	
+	/** 拡張変換処理. **/
+	private static SerializableOriginCode ORIGIN_CODE = null;
+	
+	/**
+	 * 拡張変換処理を追加.
+	 * @param code
+	 */
+	public static final void setOriginCode(SerializableOriginCode code) {
+		ORIGIN_CODE = code;
+	}
 
 	/**
 	 * オブジェクトをバイナリに変換.
@@ -30,8 +41,8 @@ public final class SerializableCore {
 	 * @return byte[] 変換されたバイナリ情報が返却されます.
 	 * @exception Exception 例外.
 	 */
-	public static final byte[] encodeBinary(Object o) throws Exception {
-		return encodeBinary(null, o);
+	public static final byte[] encode(Object o) throws Exception {
+		return encode(null, o);
 	}
 
 	/**
@@ -42,7 +53,7 @@ public final class SerializableCore {
 	 * @return byte[] 変換されたバイナリ情報が返却されます.
 	 * @exception Exception 例外.
 	 */
-	public static final byte[] encodeBinary(ByteArrayIO buf, Object o) throws Exception {
+	public static final byte[] encode(ByteArrayIO buf, Object o) throws Exception {
 		if (buf == null) {
 			buf = new ByteArrayIO();
 		}
@@ -81,8 +92,8 @@ public final class SerializableCore {
 	 * @return Object 変換されたオブジェクトが返却されます.
 	 * @exception Exception 例外.
 	 */
-	public static final Object decodeBinary(byte[] b) throws Exception {
-		return decodeBinary(b, 0, b.length);
+	public static final Object decode(byte[] b) throws Exception {
+		return decode(b, 0, b.length);
 	}
 
 	/**
@@ -94,9 +105,9 @@ public final class SerializableCore {
 	 * @return Object 変換されたオブジェクトが返却されます.
 	 * @exception Exception 例外.
 	 */
-	public static final Object decodeBinary(byte[] b, int off, int len) throws Exception {
+	public static final Object decode(byte[] b, int off, int len) throws Exception {
 		int[] p = new int[] { off };
-		return decodeBinary(b, p, len);
+		return decode(b, p, len);
 	}
 
 	/**
@@ -108,7 +119,7 @@ public final class SerializableCore {
 	 * @return Object 変換されたオブジェクトが返却されます.
 	 * @exception Exception 例外.
 	 */
-	public static final Object decodeBinary(byte[] b, int[] p, int len) throws Exception {
+	public static final Object decode(byte[] b, int[] p, int len) throws Exception {
 		// ポジションバックアップ・
 		int pos = p[0];
 
@@ -129,17 +140,17 @@ public final class SerializableCore {
 	}
 
 	/** 1バイトバイナリ変換. **/
-	protected static final void byte1(OutputStream buf, int b) throws Exception {
+	public static final void byte1(OutputStream buf, int b) throws Exception {
 		buf.write((b & 0xff));
 	}
 
 	/** 2バイトバイナリ変換. **/
-	protected static final void byte2(OutputStream buf, int b) throws Exception {
+	public static final void byte2(OutputStream buf, int b) throws Exception {
 		buf.write(new byte[] { (byte) ((b & 0xff00) >> 8), (byte) (b & 0xff) });
 	}
 
 	/** 4バイトバイナリ変換. **/
-	protected static final void byte4(OutputStream buf, int b) throws Exception {
+	public static final void byte4(OutputStream buf, int b) throws Exception {
 		// 4バイトの場合は、先頭2ビットをビット長とする.
 		int bit = BinaryUtils.nlzs(b);
 		int src = (bit >> 3) + ((bit & 1) | ((bit >> 1) & 1) | ((bit >> 2) & 1));
@@ -185,7 +196,7 @@ public final class SerializableCore {
 	}
 
 	/** 8バイトバイナリ変換. **/
-	protected static final void byte8(OutputStream buf, long b) throws Exception {
+	public static final void byte8(OutputStream buf, long b) throws Exception {
 		// 8バイトの場合は、先頭3ビットをビット長とする.
 		int bit = BinaryUtils.nlzs(b);
 		int src = (bit >> 3) + ((bit & 1) | ((bit >> 1) & 1) | ((bit >> 2) & 1));
@@ -273,17 +284,17 @@ public final class SerializableCore {
 	}
 
 	/** 1バイト数値変換. **/
-	protected static final int byte1Int(byte[] b, int[] off) {
+	public static final int byte1Int(byte[] b, int[] off) {
 		return b[off[0]++] & 0xff;
 	}
 
 	/** 2バイト数値変換. **/
-	protected static final int byte2Int(byte[] b, int[] off) {
+	public static final int byte2Int(byte[] b, int[] off) {
 		return ((b[off[0]++] & 0xff) << 8) | (b[off[0]++] & 0xff);
 	}
 
 	/** 4バイト数値変換. **/
-	protected static final int byte4Int(byte[] b, int[] off) {
+	public static final int byte4Int(byte[] b, int[] off) {
 		int o = off[0];
 		if ((b[o] & 0x3f) == 0) {
 			// ヘッダ2ビットが単体１バイト定義の場合.
@@ -323,7 +334,7 @@ public final class SerializableCore {
 	}
 
 	/** 8バイト数値変換. **/
-	protected static final long byte8Long(byte[] b, int[] off) {
+	public static final long byte8Long(byte[] b, int[] off) {
 		int o = off[0];
 		if ((b[o] & 0x1f) == 0) {
 			// ヘッダ3ビットが単体１バイト定義の場合.
@@ -400,12 +411,12 @@ public final class SerializableCore {
 	}
 
 	/**
-	 * 抽出文字列のバイナリ化.
+	 * 抽出シーケンス文字列のバイナリ化.
 	 *
 	 * @param buf 対象のバッファを設定します.
 	 * @param ext 抽出文字列情報を設定します
 	 */
-	protected static final void convertExtractionString(OutputStream buf, Map<String, Integer> ext) throws Exception {
+	public static final void convertExtractionString(OutputStream buf, Map<String, Integer> ext) throws Exception {
 		byte[] b;
 		String key;
 		int len = ext.size();
@@ -430,7 +441,7 @@ public final class SerializableCore {
 	 * @param pos 開始ポジションを設定します.
 	 * @return String[] 抽出文字列が返却されます.
 	 */
-	protected static final String[] getExtractionString(byte[] b, int[] pos) throws Exception {
+	public static final String[] getExtractionString(byte[] b, int[] pos) throws Exception {
 		int bLen;
 		int len = byte4Int(b, pos);
 		String[] ret = new String[len];
@@ -445,14 +456,16 @@ public final class SerializableCore {
 	/**
 	 * 文字バイナリ変換.
 	 *
-	 * @param buf 対象のバッファを設定します.
-	 * @param s   対象の情報を設定します.
+	 * @param strSeqMap 文字列のシーケンス番号付与用のオブジェクトを設定します.
+	 * @param buf       対象のバッファを設定します.
+	 * @param s         対象の情報を設定します.
 	 */
-	protected static final void stringBinary(Map<String, Integer> stringCode, OutputStream buf, String s)
+	public static final void stringBinary(Map<String, Integer> strSeqMap, OutputStream buf, String s)
 			throws Exception {
-		Integer n = stringCode.get(s);
+		Integer n = strSeqMap.get(s);
 		if (n == null) {
-			stringCode.put(s, (n = stringCode.size()));
+			n = strSeqMap.size();
+			strSeqMap.put(s, n);
 		}
 		// 番号セット.
 		byte4(buf, n);
@@ -461,12 +474,12 @@ public final class SerializableCore {
 	/**
 	 * バイナリ文字変換.
 	 * 
-	 * @param stringMap
+	 * @param stringMap シーケンス番号の文字列変換用情報を設定します.
 	 * @param b         対象のバイナリを設定します.
 	 * @param pos       対象のポジションを設定します.
 	 * @return String 対象の情報が返却されます.
 	 */
-	protected static final String byteString(String[] stringMap, byte[] b, int[] pos) throws Exception {
+	public static final String byteString(String[] stringMap, int[] pos, byte[] b) throws Exception {
 		return stringMap[byte4Int(b, pos)];
 	}
 
@@ -476,7 +489,7 @@ public final class SerializableCore {
 	 * @param buf 対象のバッファを設定します.
 	 * @param s   対象の情報を設定します.
 	 */
-	protected static final void serialBinary(OutputStream buf, Serializable s) throws Exception {
+	public static final void serialBinary(OutputStream buf, Serializable s) throws Exception {
 		byte[] b = SerializableUtil.toBinary(s);
 		byte4(buf, b.length); // 長さ.
 		buf.write(b, 0, b.length); // body.
@@ -489,7 +502,7 @@ public final class SerializableCore {
 	 * @param pos 対象のポジションを設定します.
 	 * @return Object 対象の情報が返却されます.
 	 */
-	protected static final Object byteSerial(byte[] b, int[] pos) throws Exception {
+	public static final Object byteSerial(byte[] b, int[] pos) throws Exception {
 		int len = byte4Int(b, pos);
 		if (len == 0) {
 			return null;
@@ -502,19 +515,30 @@ public final class SerializableCore {
 	/**
 	 * オブジェクトデータ変換.
 	 * 
+	 * @param strSeqMap 文字列のシーケンス番号付与用のオブジェクトを設定します.
 	 * @param buf 対象のバッファを設定します.
 	 * @param o   対象のオブジェクトを設定します.
 	 * @exception Exception 例外.
 	 */
 	@SuppressWarnings("rawtypes")
-	protected static final void encodeObject(Map<String, Integer> stringCode, OutputStream buf, Object o)
+	public static final void encodeObject(Map<String, Integer> strSeqMap, OutputStream buf, Object o)
 			throws Exception {
+		// その他変換コードが設定されている場合.
+		if(ORIGIN_CODE != null) {
+			// オブジェクト変換.
+			o = ORIGIN_CODE.convert(o);
+			
+			// その他変換コードが設定されている場合.
+			if(ORIGIN_CODE.encode(strSeqMap, buf, o)) {
+				return;
+			}
+		}
 		byte[] b;
 		if (o == null) {
 			head(buf, 0xff); // null.
 		} else if (o instanceof String) {
 			head(buf, 1); // string.
-			stringBinary(stringCode, buf, (String) o);
+			stringBinary(strSeqMap, buf, (String) o);
 		} else if (o instanceof Boolean) {
 			head(buf, 2); // boolean.
 			byte1(buf, ((Boolean) o).booleanValue() ? 1 : 0);
@@ -550,11 +574,11 @@ public final class SerializableCore {
 			} else if (o instanceof BigDecimal) {
 				head(buf, 12); // BigDecimal.
 				// 文字変換.
-				stringBinary(stringCode, buf, o.toString());
+				stringBinary(strSeqMap, buf, o.toString());
 			} else if (o instanceof BigInteger) {
 				head(buf, 13); // BigInteger.
 				// 文字変換.
-				stringBinary(stringCode, buf, o.toString());
+				stringBinary(strSeqMap, buf, o.toString());
 			}
 		} else if (o instanceof java.util.Date) {
 			head(buf, 14); // Date.
@@ -571,20 +595,20 @@ public final class SerializableCore {
 			else {
 				byte1(buf, 5);
 				// オブジェクト名をセット.
-				stringBinary(stringCode, buf, o.getClass().getName());
+				stringBinary(strSeqMap, buf, o.getClass().getName());
 			}
 			byte8(buf, ((Date) o).getTime());
 		} else if (o instanceof SerializeObject) {
 			head(buf, 15); // SerializeObject.
 			// オブジェクト名をセット.
-			stringBinary(stringCode, buf, o.getClass().getName());
+			stringBinary(strSeqMap, buf, o.getClass().getName());
 			// バイナリ変換.
 			((SerializeObject) o).toBinary(buf);
 		} else if (o.getClass().isArray()) {
 			if (o instanceof boolean[]) {
 				head(buf, 20); // boolean配列.
-				boolean[] c = (boolean[]) o;
-				int len = c.length;
+				final boolean[] c = (boolean[]) o;
+				final int len = c.length;
 				byte4(buf, len); // 長さ.
 				for (int i = 0; i < len; i++) {
 					byte1(buf, c[i] ? 1 : 0);
@@ -597,75 +621,71 @@ public final class SerializableCore {
 				b = null;
 			} else if (o instanceof char[]) {
 				head(buf, 22); // char配列.
-				char[] c = (char[]) o;
-				int len = c.length;
+				final char[] c = (char[]) o;
+				final int len = c.length;
 				byte4(buf, len); // 長さ.
 				for (int i = 0; i < len; i++) {
 					byte2(buf, c[i]);
 				}
 			} else if (o instanceof short[]) {
 				head(buf, 23); // short配列.
-				short[] c = (short[]) o;
-				int len = c.length;
+				final short[] c = (short[]) o;
+				final int len = c.length;
 				byte4(buf, len); // 長さ.
 				for (int i = 0; i < len; i++) {
 					byte2(buf, c[i]);
 				}
 			} else if (o instanceof int[]) {
 				head(buf, 24); // int配列.
-				int[] c = (int[]) o;
-				int len = c.length;
+				final int[] c = (int[]) o;
+				final int len = c.length;
 				byte4(buf, len); // 長さ.
 				for (int i = 0; i < len; i++) {
 					byte4(buf, c[i]);
 				}
 			} else if (o instanceof long[]) {
 				head(buf, 25); // long配列.
-				long[] c = (long[]) o;
-				int len = c.length;
+				final long[] c = (long[]) o;
+				final int len = c.length;
 				byte4(buf, len); // 長さ.
 				for (int i = 0; i < len; i++) {
 					byte8(buf, c[i]);
 				}
 			} else if (o instanceof float[]) {
 				head(buf, 26); // float配列.
-				float[] c = (float[]) o;
-				int len = c.length;
+				final float[] c = (float[]) o;
+				final int len = c.length;
 				byte4(buf, len); // 長さ.
 				for (int i = 0; i < len; i++) {
 					byte4(buf, Float.floatToRawIntBits(c[i]));
 				}
 			} else if (o instanceof double[]) {
 				head(buf, 27); // double配列.
-				double[] c = (double[]) o;
-				int len = c.length;
+				final double[] c = (double[]) o;
+				final int len = c.length;
 				byte4(buf, len); // 長さ.
 				for (int i = 0; i < len; i++) {
 					byte8(buf, Double.doubleToRawLongBits(c[i]));
 				}
 			} else if (o instanceof String[]) {
 				head(buf, 28); // String配列.
-				String[] c = (String[]) o;
-				int len = c.length;
+				final String[] c = (String[]) o;
+				final int len = c.length;
 				byte4(buf, len); // 長さ.
 				for (int i = 0; i < len; i++) {
-					stringBinary(stringCode, buf, c[i]);
+					stringBinary(strSeqMap, buf, c[i]);
 				}
 			} else {
-				String s = o.getClass().getName();
 				// 配列オブジェクトの場合.
-				if (s.startsWith("[L")) {
-					// 他配列.
-					head(buf, 50); // 他配列.
-
-					// オブジェクト名をセット.
-					stringBinary(stringCode, buf, s.substring(2, s.length() - 1).trim());
+				if (o.getClass().isArray()) {
+					// Object配列.
+					head(buf, 50); // Object配列.
 
 					// 配列データセット.
-					int len = Array.getLength(o);
+					final int len = Array.getLength(o);
 					byte4(buf, len); // 長さ.
 					for (int i = 0; i < len; i++) {
-						encodeObject(stringCode, buf, Array.get(o, i));
+						encodeObject(strSeqMap, buf, Array.get(o, i));
 					}
 				}
 				// 多重配列の場合.
@@ -677,30 +697,30 @@ public final class SerializableCore {
 			}
 		} else if (o instanceof List) {
 			head(buf, 51); // Listオブジェクト.
-			List lst = (List) o;
-			int len = lst.size();
+			final List lst = (List) o;
+			final int len = lst.size();
 			byte4(buf, len); // 長さ.
 			for (int i = 0; i < len; i++) {
-				encodeObject(stringCode, buf, lst.get(i));
+				encodeObject(strSeqMap, buf, lst.get(i));
 			}
 		} else if (o instanceof Map) {
 			head(buf, 52); // Mapオブジェクト.
 			Object k;
-			Map map = (Map) o;
+			final Map map = (Map) o;
 			byte4(buf, map.size()); // 長さ.
-			Iterator it = map.keySet().iterator();
+			final Iterator it = map.keySet().iterator();
 			while (it.hasNext()) {
 				k = it.next();
-				encodeObject(stringCode, buf, k); // キー.
-				encodeObject(stringCode, buf, map.get(k)); // 要素.
+				encodeObject(strSeqMap, buf, k); // キー.
+				encodeObject(strSeqMap, buf, map.get(k)); // 要素.
 			}
 		} else if (o instanceof Set) {
 			head(buf, 53); // Setオブジェクト.
-			Set set = (Set) o;
+			final Set set = (Set) o;
 			byte4(buf, set.size()); // 長さ.
-			Iterator it = set.iterator();
+			final Iterator it = set.iterator();
 			while (it.hasNext()) {
-				encodeObject(stringCode, buf, it.next()); // キー.
+				encodeObject(strSeqMap, buf, it.next()); // キー.
 			}
 		} else if (o instanceof Serializable) {
 			head(buf, 60); // シリアライズオブジェクト.
@@ -715,86 +735,77 @@ public final class SerializableCore {
 	/**
 	 * オブジェクト解析.
 	 * 
+	 * @param stringMap シーケンス番号の文字列変換用情報を設定します.
 	 * @param pos    対象のポジションを設定します.
 	 * @param b      対象のバイナリを設定します.
 	 * @param length 対象の長さを設定します.
 	 * @return Object 変換されたオブジェクトが返却されます.
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	protected static final Object decodeObject(String[] stringMap, int[] pos, byte[] b, int length) throws Exception {
+	public static final Object decodeObject(String[] stringMap, int[] pos, byte[] b, int length) throws Exception {
 		if (length <= pos[0]) {
 			throw new IOException("Attempting to process beyond specified length " + length + " byte: " + pos[0]);
 		}
 
 		int i, len;
 		Object ret;
-		int code = byte1Int(b, pos);
+		final int code = byte1Int(b, pos);
 		switch (code) {
 		case 1: {
 			// string.
-			return byteString(stringMap, b, pos);
+			return byteString(stringMap, pos, b);
 		}
 		case 2: {
 			// boolean.
-			ret = (byte1Int(b, pos) == 1);
-			return ret;
+			return (byte1Int(b, pos) == 1);
 		}
 		case 3: {
 			// char.
-			ret = (char) byte2Int(b, pos);
-			return ret;
+			return (char) byte2Int(b, pos);
 		}
 		case 4: {
 			// byte.
-			ret = (byte) byte1Int(b, pos);
-			return ret;
+			return (byte) byte1Int(b, pos);
 		}
 		case 5: {
 			// short.
-			ret = (short) byte2Int(b, pos);
-			return ret;
+			return (short) byte2Int(b, pos);
 		}
 		case 6: {
 			// int.
-			ret = byte4Int(b, pos);
-			return ret;
+			return byte4Int(b, pos);
 		}
 		case 7: {
 			// long.
-			ret = byte8Long(b, pos);
-			return ret;
+			return byte8Long(b, pos);
 		}
 		case 8: {
 			// float.
-			ret = Float.intBitsToFloat(byte4Int(b, pos));
-			return ret;
+			return Float.intBitsToFloat(byte4Int(b, pos));
 		}
 		case 9: {
 			// double.
-			ret = Double.longBitsToDouble(byte8Long(b, pos));
-			return ret;
+			return Double.longBitsToDouble(byte8Long(b, pos));
 		}
 		case 10: {
 			// AtomicInteger.
-			ret = new AtomicInteger(byte4Int(b, pos));
-			return ret;
+			return new AtomicInteger(byte4Int(b, pos));
 		}
 		case 11: {
 			// AtomicLong.
-			ret = new AtomicLong(byte8Long(b, pos));
-			return ret;
+			return new AtomicLong(byte8Long(b, pos));
 		}
 		case 12: {
 			// BigDecimal.
-			return new BigDecimal(byteString(stringMap, b, pos));
+			return new BigDecimal(byteString(stringMap, pos, b));
 		}
 		case 13: {
 			// BigInteger.
-			return new BigInteger(byteString(stringMap, b, pos));
+			return new BigInteger(byteString(stringMap, pos, b));
 		}
 		case 14: {
 			// Date.
-			int type = byte1Int(b, pos);
+			final int type = byte1Int(b, pos);
 			if (type == 1) {
 				ret = new java.sql.Date(byte8Long(b, pos));
 			} else if (type == 2) {
@@ -805,7 +816,7 @@ public final class SerializableCore {
 				ret = new java.util.Date(byte8Long(b, pos));
 			} else {
 				// 他オブジェクトの場合はオブジェクトを生成して処理.
-				String cls = byteString(stringMap, b, pos);
+				final String cls = byteString(stringMap, pos, b);
 				ret = FastReflect.newInstance(cls);
 				((java.util.Date) ret).setTime(byte8Long(b, pos));
 			}
@@ -813,7 +824,7 @@ public final class SerializableCore {
 		}
 		case 15: {
 			// SerializeObject.
-			String cls = byteString(stringMap, b, pos);
+			final String cls = byteString(stringMap, pos, b);
 			ret = FastReflect.newInstance(cls);
 			pos[0] = ((SerializeObject) ret).toObject(b, pos[0]);
 			return ret;
@@ -821,7 +832,7 @@ public final class SerializableCore {
 		case 20: {
 			// boolean配列.
 			len = byte4Int(b, pos);
-			boolean[] lst = new boolean[len];
+			final boolean[] lst = new boolean[len];
 			for (i = 0; i < len; i++) {
 				lst[i] = (byte1Int(b, pos) == 1);
 			}
@@ -838,7 +849,7 @@ public final class SerializableCore {
 		case 22: {
 			// char配列.
 			len = byte4Int(b, pos);
-			char[] lst = new char[len];
+			final char[] lst = new char[len];
 			for (i = 0; i < len; i++) {
 				lst[i] = (char) byte2Int(b, pos);
 			}
@@ -847,7 +858,7 @@ public final class SerializableCore {
 		case 23: {
 			// short配列.
 			len = byte4Int(b, pos);
-			short[] lst = new short[len];
+			final short[] lst = new short[len];
 			for (i = 0; i < len; i++) {
 				lst[i] = (short) byte2Int(b, pos);
 			}
@@ -856,7 +867,7 @@ public final class SerializableCore {
 		case 24: {
 			// int配列.
 			len = byte4Int(b, pos);
-			int[] lst = new int[len];
+			final int[] lst = new int[len];
 			for (i = 0; i < len; i++) {
 				lst[i] = byte4Int(b, pos);
 			}
@@ -865,7 +876,7 @@ public final class SerializableCore {
 		case 25: {
 			// long配列.
 			len = byte4Int(b, pos);
-			long[] lst = new long[len];
+			final long[] lst = new long[len];
 			for (i = 0; i < len; i++) {
 				lst[i] = byte8Long(b, pos);
 			}
@@ -874,7 +885,7 @@ public final class SerializableCore {
 		case 26: {
 			// float配列.
 			len = byte4Int(b, pos);
-			float[] lst = new float[len];
+			final float[] lst = new float[len];
 			for (i = 0; i < len; i++) {
 				lst[i] = Float.intBitsToFloat(byte4Int(b, pos));
 			}
@@ -883,7 +894,7 @@ public final class SerializableCore {
 		case 27: {
 			// double配列.
 			len = byte4Int(b, pos);
-			double[] lst = new double[len];
+			final double[] lst = new double[len];
 			for (i = 0; i < len; i++) {
 				lst[i] = Double.longBitsToDouble(byte8Long(b, pos));
 			}
@@ -892,26 +903,25 @@ public final class SerializableCore {
 		case 28: {
 			// String配列.
 			len = byte4Int(b, pos);
-			String[] lst = new String[len];
+			final String[] lst = new String[len];
 			for (i = 0; i < len; i++) {
-				lst[i] = byteString(stringMap, b, pos);
+				lst[i] = byteString(stringMap, pos, b);
 			}
 			return lst;
 		}
 		case 50: {
-			// 配列.
-			String cls = byteString(stringMap, b, pos);
+			// Object配列.
 			len = byte4Int(b, pos);
-			Object lst = Array.newInstance(FastReflect.getClass(cls), len);
+			final Object[] lst = new Object[len];
 			for (i = 0; i < len; i++) {
-				Array.set(lst, i, decodeObject(stringMap, pos, b, length));
+				lst[i] = decodeObject(stringMap, pos, b, length);
 			}
 			return lst;
 		}
 		case 51: {
 			// List.
 			len = byte4Int(b, pos);
-			List lst = new ArrayList();
+			final List lst = new ArrayList();
 			for (i = 0; i < len; i++) {
 				lst.add(decodeObject(stringMap, pos, b, length));
 			}
@@ -920,7 +930,7 @@ public final class SerializableCore {
 		case 52: {
 			// Map.
 			len = byte4Int(b, pos);
-			Map map = new AndroidMap();
+			final Map map = new AndroidMap();
 			for (i = 0; i < len; i++) {
 				map.put(decodeObject(stringMap, pos, b, length), decodeObject(stringMap, pos, b, length));
 			}
@@ -929,7 +939,7 @@ public final class SerializableCore {
 		case 53: {
 			// Set.
 			len = byte4Int(b, pos);
-			Set set = new HashSet();
+			final Set set = new HashSet();
 			for (i = 0; i < len; i++) {
 				set.add(decodeObject(stringMap, pos, b, length));
 			}
@@ -944,12 +954,106 @@ public final class SerializableCore {
 			return null;
 		}
 		}
+		
+		// その他変換コードが設定されている場合.
+		if(ORIGIN_CODE != null && code >= SerializableOriginCode.USE_OBJECT_CODE) {
+			ret = ORIGIN_CODE.decode(stringMap, pos, b, length);
+			if(ret != null) {
+				return ret;
+			}
+			ORIGIN_CODE.noneDecode(code);
+		}
 		throw new IOException("Unknown type '" + code + "' detected.");
 	}
 
 	/** ヘッダ文字セット. **/
-	private static final void head(OutputStream buf, int n) throws Exception {
+	public static final void head(OutputStream buf, int n) throws Exception {
 		byte1(buf, n);
 	}
 
+	/**
+	 * 拡張エンコード、デコード処理を行う場合の継承クラス.
+	 * 
+	 * エンコード時には、必ず
+	 * 
+	 *  SerializableCore.head(buf, USE_OBJECT_CODE); // objectCode(100番以降をセット).
+	 *  オブジェクトを変換.
+	 *  
+	 * のように設定します.
+	 */
+	public static abstract class SerializableOriginCode {
+		/**
+		 * オブジェクトコード利用可能開始番号.
+		 */
+		protected static final int USE_OBJECT_CODE = 100;
+		
+		/**
+		 * オブジェクトの変換.
+		 * @param o オブジェクトを設定します.
+		 * @return Object 変換されたオブジェクトが返却されます.
+		 * @exception Exception 例外.
+		 */
+		public Object convert(Object o) throws Exception {
+			return o;
+		}
+		
+		/**
+		 * オブジェクトをバイナリに変換.
+		 *
+		 * @param strSeqMap 文字列のシーケンス番号付与用のオブジェクトを設定します.
+		 *                  文字列をエンコードする場合に encodeString メソッドの引数に渡して利用します.
+		 * @param buf 対象のバッファを設定します.
+		 * @param o   対象のオブジェクトを設定します.
+		 * @return boolean 変換出来た場合は[true]を返却します.
+		 * @exception Exception 例外.
+		 */
+		public abstract boolean encode(Map<String, Integer> stringCode, OutputStream buf, Object o) throws Exception;
+		
+		/**
+		 * 文字列をエンコードする場合に利用.
+		 *
+		 * @param strSeqMap 文字列のシーケンス番号付与用のオブジェクトを設定します.
+		 * @param buf       対象のバッファを設定します.
+		 * @param s         対象の情報を設定します.
+		 */
+		public final void encodeString(Map<String, Integer> strSeqMap, OutputStream buf, String s)
+				throws Exception {
+			SerializableCore.stringBinary(strSeqMap, buf, s);
+		}
+		
+		/**
+		 * バイナリをオブジェクトに変換.
+		 * 
+		 * @param stringMap シーケンス番号の文字列変換用情報を設定します.
+		 *                  文字列をデコードする場合に decodeString メソッドの引数に渡して利用します.
+		 * @param pos       対象のポジションを設定します.
+		 * @param b         対象のバイナリを設定します.
+		 * @param length    対象の長さを設定します.
+		 * @return Object   変換されたオブジェクトが返却されます.
+		 * @exception Exception 例外.
+		 */
+		public abstract Object decode(String[] stringMap, int[] pos, byte[] b, int length) throws Exception;
+		
+		/**
+		 * 文字列をデコードする場合に利用.
+		 * 
+		 * @param stringMap シーケンス番号の文字列変換用情報を設定します.
+		 * @param pos       対象のポジションを設定します.
+		 * @param b         対象のバイナリを設定します.
+		 * @return String   対象の情報が返却されます.
+		 */
+		public final String decodeString(String[] stringMap, int[] pos, byte[] b) throws Exception {
+			return SerializableCore.byteString(stringMap, pos, b);
+		}
+		
+		/**
+		 * 当てはまらない条件のデコード返却.
+		 * デコード対象のオブジェクトコードの場合は、この処理を呼び出します.
+		 * 
+		 * @param objectCode
+		 */
+		public void noneDecode(int objectCode) throws Exception {
+			throw new IOException("Unknown type '" + objectCode + "' detected.");
+		}
+	}
 }

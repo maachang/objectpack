@@ -59,7 +59,7 @@ public final class ObjectPack {
 	 * @return byte[] パック化されたバイナリが返却されます.
 	 */
 	public static final byte[] packB(Object o, Boolean gzip) throws Exception {
-		byte[] bin = SerializableCore.encodeBinary(o);
+		byte[] bin = SerializableCore.encode(o);
 		if (gzip == null) {
 			return bin;
 		} else if (gzip) {
@@ -111,7 +111,7 @@ public final class ObjectPack {
 				b = buf.toByteArray();
 			}
 		}
-		return SerializableCore.decodeBinary(b);
+		return SerializableCore.decode(b);
 	}
 
 	/**

@@ -24,90 +24,86 @@ package objectpack;
  */
 public class JSnappyBuffer {
 
-    private byte[] data;
-    private int length;
+	private byte[] data;
+	private int length;
 
-    /**
-     * Creates an unitialized buffer.
-     */
-    public JSnappyBuffer() {
-    }
+	/**
+	 * Creates an unitialized buffer.
+	 */
+	public JSnappyBuffer() {
+	}
 
-    /**
-     * Creates an initialized buffer with the specified capacity.
-     * 
-     * @param capacity
-     *            initial buffer length in bytes
-     */
-    public JSnappyBuffer(int capacity) {
-        data = new byte[capacity];
-    }
+	/**
+	 * Creates an initialized buffer with the specified capacity.
+	 * 
+	 * @param capacity initial buffer length in bytes
+	 */
+	public JSnappyBuffer(int capacity) {
+		data = new byte[capacity];
+	}
 
-    /**
-     * オブジェクトリセット.
-     * 
-     * @param length
-     *            リセットするバイナリ長を設定します.
-     */
-    public void reset(int length) {
-        if (data == null || data.length != length) {
-            data = new byte[length];
-        }
-    }
+	/**
+	 * オブジェクトリセット.
+	 * 
+	 * @param length リセットするバイナリ長を設定します.
+	 */
+	public void reset(int length) {
+		if (data == null || data.length != length) {
+			data = new byte[length];
+		}
+	}
 
-    /**
-     * オブジェクト再利用.
-     * 
-     * @param length
-     *            再利用時のバイナリ長を設定します.
-     */
-    public void clear(int length) {
-        if (data == null || data.length < length) {
-            data = new byte[length];
-        }
-    }
+	/**
+	 * オブジェクト再利用.
+	 * 
+	 * @param length 再利用時のバイナリ長を設定します.
+	 */
+	public void clear(int length) {
+		if (data == null || data.length < length) {
+			data = new byte[length];
+		}
+	}
 
-    /**
-     * Returns the byte array used as a backing store for this buffer. Note that
-     * invoking ensureCapacity can cause the backing array to be replaced.
-     * 
-     * @return
-     */
-    public byte[] getData() {
-        return data;
-    }
+	/**
+	 * Returns the byte array used as a backing store for this buffer. Note that
+	 * invoking ensureCapacity can cause the backing array to be replaced.
+	 * 
+	 * @return
+	 */
+	public byte[] getData() {
+		return data;
+	}
 
-    /**
-     * Returns the length of this buffer. The backing array should contain valid
-     * data from index 0 to length - 1.
-     * 
-     * @return
-     */
-    public int getLength() {
-        return length;
-    }
+	/**
+	 * Returns the length of this buffer. The backing array should contain valid
+	 * data from index 0 to length - 1.
+	 * 
+	 * @return
+	 */
+	public int getLength() {
+		return length;
+	}
 
-    /**
-     * Sets the length of this buffer. The backing array should contain valid
-     * data from index 0 to length - 1.
-     * 
-     * @param length
-     *            buffer length
-     */
-    public void setLength(int length) {
-        this.length = length;
-    }
+	/**
+	 * Sets the length of this buffer. The backing array should contain valid data
+	 * from index 0 to length - 1.
+	 * 
+	 * @param length buffer length
+	 */
+	public void setLength(int length) {
+		this.length = length;
+	}
 
-    /**
-     * Returns a copy of the buffers internal array in a newly allocated byte
-     * array with the buffer's length.
-     * 
-     * @return
-     */
-    public byte[] toByteArray() {
-        byte[] res = new byte[length];
-        System.arraycopy(data, 0, res, 0, length);
-        return res;
-    }
+	/**
+	 * Returns a copy of the buffers internal array in a newly allocated byte array
+	 * with the buffer's length.
+	 * 
+	 * @return
+	 */
+	public byte[] toByteArray() {
+		byte[] res = new byte[length];
+		System.arraycopy(data, 0, res, 0, length);
+		return res;
+	}
 
 }

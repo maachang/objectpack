@@ -37,12 +37,11 @@ public class FastReflect {
 		}
 
 		public FastReflectException(Throwable e) {
-			super(e instanceof InvocationTargetException ? ((InvocationTargetException)e).getCause() : e);
+			super(e instanceof InvocationTargetException ? ((InvocationTargetException) e).getCause() : e);
 		}
 
 		public FastReflectException(String message, Throwable e) {
-			super(message,
-				e instanceof InvocationTargetException ? ((InvocationTargetException)e).getCause() : e);
+			super(message, e instanceof InvocationTargetException ? ((InvocationTargetException) e).getCause() : e);
 		}
 	}
 
@@ -734,9 +733,10 @@ public class FastReflect {
 
 		/**
 		 * 指定フィールド名が存在するかチェック.
+		 * 
 		 * @param staticFlag [true]の場合、staticアクセス用として取得します.
 		 * @param name       指定クラスフィールド名を設定します.
-		 * @return boolean   [true]の場合、フィールドは存在します.
+		 * @return boolean [true]の場合、フィールドは存在します.
 		 */
 		public final boolean isField(boolean staticFlag, String name) {
 			FieldObject f = fileds.get();
@@ -747,10 +747,11 @@ public class FastReflect {
 			}
 			return f.isField(staticFlag, name);
 		}
-		
+
 		/**
 		 * 指定フィールド名群を取得.
-		 * @param out 設定オブジェクトを設定します.
+		 * 
+		 * @param out        設定オブジェクトを設定します.
 		 * @param staticFlag staticメソッドでのアクセスの場合は[true]を設定します.
 		 */
 		public final void fieldNames(Set<String> out, boolean staticFlag) {
@@ -762,7 +763,7 @@ public class FastReflect {
 			}
 			f.getNames(out, staticFlag);
 		}
-		
+
 		/**
 		 * 指定クラスフィールド名に対するフィールド要素を取得.
 		 * 
@@ -782,9 +783,10 @@ public class FastReflect {
 
 		/**
 		 * 指定メソッド名が存在するかチェック.
+		 * 
 		 * @param staticFlag [true]の場合、staticアクセス用として取得します.
 		 * @param name       指定メソッド名を設定します.
-		 * @return boolean   [true]の場合、メソッドは存在します.
+		 * @return boolean [true]の場合、メソッドは存在します.
 		 */
 		public final boolean isMethod(boolean staticFlag, String name) {
 			MethodObject m = methods.get();
@@ -795,10 +797,11 @@ public class FastReflect {
 			}
 			return m.isMethod(staticFlag, name);
 		}
-		
+
 		/**
 		 * 指定メソッド名群を取得.
-		 * @param out 設定オブジェクトを設定します.
+		 * 
+		 * @param out        設定オブジェクトを設定します.
 		 * @param staticFlag staticメソッドでのアクセスの場合は[true]を設定します.
 		 */
 		public final void methodNames(Set<String> out, boolean staticFlag) {
@@ -822,7 +825,8 @@ public class FastReflect {
 		 * @param args   引数パラメータ型群を設定します.
 		 * @return boolean [true]の場合、実行されました.
 		 */
-		public final boolean invoke(Object[] result, Object target, String name, ClassLoader cl, Class[] types, Object[] args) {
+		public final boolean invoke(Object[] result, Object target, String name, ClassLoader cl, Class[] types,
+				Object[] args) {
 			MethodObject m = methods.get();
 			if (m == null) {
 				m = new MethodObject(clazz);
@@ -899,15 +903,17 @@ public class FastReflect {
 				}
 			}
 		}
+
 		/**
 		 * 指定メソッド名が存在するかチェック.
+		 * 
 		 * @param staticFlg staticメソッドでのアクセスの場合は[true]を設定します.
-		 * @param name 対象のメソッド名を設定します.
+		 * @param name      対象のメソッド名を設定します.
 		 * @return boolean [true]の場合、存在します.
 		 */
 		public boolean isField(boolean staticFlg, String name) {
 			Field f = map.get(name);
-			if(f != null) {
+			if (f != null) {
 				return (Modifier.isStatic(f.getModifiers()) == staticFlg);
 			}
 			return false;
@@ -915,15 +921,16 @@ public class FastReflect {
 
 		/**
 		 * フィールド名を取得.
-		 * @param out メソッド名を設定します.
+		 * 
+		 * @param out       メソッド名を設定します.
 		 * @param staticFlg staticメソッドでのアクセスの場合は[true]を設定します.
 		 */
 		public void getNames(Set<String> out, boolean staticFlg) {
 			String name;
 			Iterator<String> it = map.keySet().iterator();
-			while(it.hasNext()) {
+			while (it.hasNext()) {
 				name = it.next();
-				if(Modifier.isStatic(map.get(name).getModifiers()) == staticFlg) {
+				if (Modifier.isStatic(map.get(name).getModifiers()) == staticFlg) {
 					out.add(name);
 				}
 			}
@@ -986,7 +993,7 @@ public class FastReflect {
 					if (Modifier.isPublic(c.getModifiers())) {
 						lst.add(new ConstractorElement(c));
 					}
-				} 
+				}
 				Object[] o = lst.toArray();
 				len = lst.size();
 				list = new ConstractorElement[len];
@@ -1108,40 +1115,42 @@ public class FastReflect {
 				}
 			}
 		}
-		
+
 		/**
 		 * 指定メソッド名が存在するかチェック.
+		 * 
 		 * @param staticFlg staticメソッドでのアクセスの場合は[true]を設定します.
-		 * @param name 対象のメソッド名を設定します.
+		 * @param name      対象のメソッド名を設定します.
 		 * @return boolean [true]の場合、存在します.
 		 */
 		public boolean isMethod(boolean staticFlg, String name) {
 			MethodElement emt = map.get(name);
 			while (emt != null) {
-				if(emt.isStatic == staticFlg) {
+				if (emt.isStatic == staticFlg) {
 					return true;
 				}
 				emt = emt.next;
 			}
 			return false;
 		}
-		
+
 		/**
 		 * メソッド名を取得.
-		 * @param out メソッド名を設定します.
+		 * 
+		 * @param out       メソッド名を設定します.
 		 * @param staticFlg staticメソッドでのアクセスの場合は[true]を設定します.
 		 */
 		public void getNames(Set<String> out, boolean staticFlg) {
 			String name;
 			Iterator<String> it = map.keySet().iterator();
-			while(it.hasNext()) {
+			while (it.hasNext()) {
 				name = it.next();
-				if(map.get(name).isStatic == staticFlg) {
+				if (map.get(name).isStatic == staticFlg) {
 					out.add(name);
 				}
 			}
 		}
-		
+
 		/**
 		 * 指定名のメソッドを実行.
 		 * 
@@ -1212,7 +1221,7 @@ public class FastReflect {
 			}
 		}
 	}
-	
+
 	// クラスファクトリ.
 	private static final ClassElementFactory FACTORY = new ClassElementFactory();
 
@@ -1324,7 +1333,8 @@ public class FastReflect {
 				em = FACTORY.getClass(loader, superName);
 			}
 			if (em == null) {
-				throw new FastReflectException("Constructor of target argument does not exist for specified class '" + clazzName + "'.");
+				throw new FastReflectException(
+						"Constructor of target argument does not exist for specified class '" + clazzName + "'.");
 			}
 		}
 	}
@@ -1363,40 +1373,40 @@ public class FastReflect {
 				em = FACTORY.getClass(loader, superName);
 			}
 			if (em == null) {
-				throw new FastReflectException("Constructor of target argument does not exist for specified class '" + clazzName + "'.");
+				throw new FastReflectException(
+						"Constructor of target argument does not exist for specified class '" + clazzName + "'.");
 			}
 		}
 	}
-	
+
 	// クラス名を取得.
 	private static final String clazzName(final Object clazzObject, final Object target) {
-		if(clazzObject == null) {
-			if(target == null) {
+		if (clazzObject == null) {
+			if (target == null) {
 				throw new FastReflectException("Class object cannot be identified.");
 			}
 			return target.getClass().getName();
-		} else if(clazzObject instanceof String) {
-			if(((String)clazzObject).isEmpty()) {
-				if(target == null) {
+		} else if (clazzObject instanceof String) {
+			if (((String) clazzObject).isEmpty()) {
+				if (target == null) {
 					throw new FastReflectException("Class object cannot be identified.");
 				}
 				return target.getClass().getName();
 			}
-			return (String)clazzObject;
-		} else if(clazzObject instanceof Class) {
-			return ((Class)clazzObject).getName();
+			return (String) clazzObject;
+		} else if (clazzObject instanceof Class) {
+			return ((Class) clazzObject).getName();
 		}
 		throw new FastReflectException("Class object cannot be identified.");
 	}
-	
+
 	/**
 	 * フィールド存在チェック.
 	 * 
 	 * @param staticFlag staticでチェックする場合は[true]を設定します.
 	 * @param loader     対象のクラスローダーを設定します.
-	 * @param clazz      対象のクラス or クラス名を設定します.
-s	 * @param name       対象のフィールド名を設定します.
-	 * @return boolean   [true]の場合、存在します.
+	 * @param clazz      対象のクラス or クラス名を設定します. s * @param name 対象のフィールド名を設定します.
+	 * @return boolean [true]の場合、存在します.
 	 */
 	public static final boolean isField(boolean staticFlag, Object clazz, String name) {
 		return isField(staticFlag, null, clazz, name);
@@ -1407,9 +1417,8 @@ s	 * @param name       対象のフィールド名を設定します.
 	 * 
 	 * @param staticFlag staticでチェックする場合は[true]を設定します.
 	 * @param loader     対象のクラスローダーを設定します.
-	 * @param clazz      対象のクラス or クラス名を設定します.
-s	 * @param name       対象のフィールド名を設定します.
-	 * @return boolean   [true]の場合、存在します.
+	 * @param clazz      対象のクラス or クラス名を設定します. s * @param name 対象のフィールド名を設定します.
+	 * @return boolean [true]の場合、存在します.
 	 */
 	public static final boolean isField(boolean staticFlag, ClassLoader loader, Object clazz, String name) {
 		ClassElement em = FACTORY.getClass(loader, clazzName(clazz, null));
@@ -1432,19 +1441,19 @@ s	 * @param name       対象のフィールド名を設定します.
 			return true;
 		}
 	}
-	
+
 	/**
 	 * メソッド存在チェック.
 	 * 
 	 * @param staticFlag staticでチェックする場合は[true]を設定します.
 	 * @param clazz      対象のクラス or クラス名を設定します.
 	 * @param name       対象のメソッド名を設定します.
-	 * @return boolean   [true]の場合、存在します.
+	 * @return boolean [true]の場合、存在します.
 	 */
 	public static final boolean isMethod(boolean staticFlag, Object clazz, String name) {
 		return isMethod(staticFlag, null, clazz, name);
 	}
-	
+
 	/**
 	 * メソッド存在チェック.
 	 * 
@@ -1452,7 +1461,7 @@ s	 * @param name       対象のフィールド名を設定します.
 	 * @param loader     対象のクラスローダーを設定します.
 	 * @param clazz      対象のクラス or クラス名を設定します.
 	 * @param name       対象のメソッド名を設定します.
-	 * @return boolean   [true]の場合、存在します.
+	 * @return boolean [true]の場合、存在します.
 	 */
 	public static final boolean isMethod(boolean staticFlag, ClassLoader loader, Object clazz, String name) {
 		ClassElement em = FACTORY.getClass(loader, clazzName(clazz, null));
@@ -1556,8 +1565,7 @@ s	 * @param name       対象のフィールド名を設定します.
 	 * フィールド設定.
 	 * 
 	 * @param clazzName 対象のクラス名を設定します.
-	 * @param target    設定対象のオブジェクトを設定します.
-	 *                  [null]の場合、staticアクセスで処理します.
+	 * @param target    設定対象のオブジェクトを設定します. [null]の場合、staticアクセスで処理します.
 	 * @param name      対象のフィールド名を設定します.
 	 * @param value     対象のパラメータ要素を設定します.
 	 */
@@ -1596,7 +1604,7 @@ s	 * @param name       対象のフィールド名を設定します.
 			}
 			try {
 				f.set(target, value);
-			} catch(Exception e) {
+			} catch (Exception e) {
 				throw new FastReflectException(e);
 			}
 			return;
@@ -1607,8 +1615,7 @@ s	 * @param name       対象のフィールド名を設定します.
 	 * フィールド設定.
 	 * 
 	 * @param clazz  対象のクラスを設定します.
-	 * @param target 設定対象のオブジェクトを設定します.
-	 *               [null]の場合、staticアクセスで処理します.
+	 * @param target 設定対象のオブジェクトを設定します. [null]の場合、staticアクセスで処理します.
 	 * @param name   対象のフィールド名を設定します.
 	 * @param value  対象のパラメータ要素を設定します.
 	 */
@@ -1621,8 +1628,7 @@ s	 * @param name       対象のフィールド名を設定します.
 	 * 
 	 * @param loader 対象のクラスローダーを設定します.
 	 * @param clazz  対象のクラスを設定します.
-	 * @param target 設定対象のオブジェクトを設定します.
-	 *               [null]の場合、staticアクセスで処理します.
+	 * @param target 設定対象のオブジェクトを設定します. [null]の場合、staticアクセスで処理します.
 	 * @param name   対象のフィールド名を設定します.
 	 * @param value  対象のパラメータ要素を設定します.
 	 */
@@ -1647,7 +1653,7 @@ s	 * @param name       対象のフィールド名を設定します.
 			}
 			try {
 				f.set(target, value);
-			} catch(Exception e) {
+			} catch (Exception e) {
 				throw new FastReflectException(e);
 			}
 			return;
@@ -1658,8 +1664,7 @@ s	 * @param name       対象のフィールド名を設定します.
 	 * フィールド取得.
 	 * 
 	 * @param clazzName 対象のクラス名を設定します.
-	 * @param target    設定対象のオブジェクトを設定します.
-	 *                  [null]の場合、staticアクセスで処理します.
+	 * @param target    設定対象のオブジェクトを設定します. [null]の場合、staticアクセスで処理します.
 	 * @param name      対象のフィールド名を設定します.
 	 * @return Object フィールドオブジェクト内容が返されます.
 	 */
@@ -1672,8 +1677,7 @@ s	 * @param name       対象のフィールド名を設定します.
 	 * 
 	 * @param loader    対象のクラスローダーを設定します.
 	 * @param clazzName 対象のクラス名を設定します.
-	 * @param target    設定対象のオブジェクトを設定します.
-	 *                  [null]の場合、staticアクセスで処理します.
+	 * @param target    設定対象のオブジェクトを設定します. [null]の場合、staticアクセスで処理します.
 	 * @param name      対象のフィールド名を設定します.
 	 * @return Object フィールドオブジェクト内容が返されます.
 	 */
@@ -1698,7 +1702,7 @@ s	 * @param name       対象のフィールド名を設定します.
 			}
 			try {
 				return f.get(target);
-			} catch(Exception e) {
+			} catch (Exception e) {
 				throw new FastReflectException(e);
 			}
 		}
@@ -1708,8 +1712,7 @@ s	 * @param name       対象のフィールド名を設定します.
 	 * フィールド取得.
 	 * 
 	 * @param clazz  対象のクラス名を設定します.
-	 * @param target 設定対象のオブジェクトを設定します.
-	 *               [null]の場合、staticアクセスで処理します.
+	 * @param target 設定対象のオブジェクトを設定します. [null]の場合、staticアクセスで処理します.
 	 * @param name   対象のフィールド名を設定します.
 	 * @return Object フィールドオブジェクト内容が返されます.
 	 */
@@ -1722,8 +1725,7 @@ s	 * @param name       対象のフィールド名を設定します.
 	 * 
 	 * @param loader 対象のクラスローダーを設定します.
 	 * @param clazz  対象のクラス名を設定します.
-	 * @param target 設定対象のオブジェクトを設定します.
-	 *               [null]の場合、staticアクセスで処理します.
+	 * @param target 設定対象のオブジェクトを設定します. [null]の場合、staticアクセスで処理します.
 	 * @param name   対象のフィールド名を設定します.
 	 * @return Object フィールドオブジェクト内容が返されます.
 	 */
@@ -1748,7 +1750,7 @@ s	 * @param name       対象のフィールド名を設定します.
 			}
 			try {
 				return f.get(target);
-			} catch(Exception e) {
+			} catch (Exception e) {
 				throw new FastReflectException(e);
 			}
 		}
@@ -1758,8 +1760,7 @@ s	 * @param name       対象のフィールド名を設定します.
 	 * メソッド呼び出し.
 	 * 
 	 * @param clazzName 対象のクラス名を設定します.
-	 * @param target    設定対象のオブジェクトを設定します.
-	 *                  [null]の場合、staticアクセスで処理します.
+	 * @param target    設定対象のオブジェクトを設定します. [null]の場合、staticアクセスで処理します.
 	 * @param name      対象のメソッド名を設定します.
 	 * @return Object 戻り値が返されます.
 	 */
@@ -1772,8 +1773,7 @@ s	 * @param name       対象のフィールド名を設定します.
 	 * 
 	 * @param loader    対象のクラスローダーを設定します.
 	 * @param clazzName 対象のクラス名を設定します.
-	 * @param target    設定対象のオブジェクトを設定します.
-	 *                  [null]の場合、staticアクセスで処理します.
+	 * @param target    設定対象のオブジェクトを設定します. [null]の場合、staticアクセスで処理します.
 	 * @param name      対象のメソッド名を設定します.
 	 * @return Object 戻り値が返されます.
 	 */
@@ -1785,8 +1785,7 @@ s	 * @param name       対象のフィールド名を設定します.
 	 * メソッド呼び出し.
 	 * 
 	 * @param clazz  対象のクラスを設定します.
-	 * @param target 設定対象のオブジェクトを設定します.
-	 *               [null]の場合、staticアクセスで処理します.
+	 * @param target 設定対象のオブジェクトを設定します. [null]の場合、staticアクセスで処理します.
 	 * @param name   対象のメソッド名を設定します.
 	 * @return Object 戻り値が返されます.
 	 */
@@ -1799,8 +1798,7 @@ s	 * @param name       対象のフィールド名を設定します.
 	 * 
 	 * @param loader 対象のクラスローダーを設定します.
 	 * @param clazz  対象のクラスを設定します.
-	 * @param target 設定対象のオブジェクトを設定します.
-	 *               [null]の場合、staticアクセスで処理します.
+	 * @param target 設定対象のオブジェクトを設定します. [null]の場合、staticアクセスで処理します.
 	 * @param name   対象のメソッド名を設定します.
 	 * @return Object 戻り値が返されます.
 	 */
@@ -1812,8 +1810,7 @@ s	 * @param name       対象のフィールド名を設定します.
 	 * メソッド呼び出し.
 	 * 
 	 * @param clazzName 対象のクラス名を設定します.
-	 * @param target    設定対象のオブジェクトを設定します.
-	 *                  [null]の場合、staticアクセスで処理します.
+	 * @param target    設定対象のオブジェクトを設定します. [null]の場合、staticアクセスで処理します.
 	 * @param name      対象のメソッド名を設定します.
 	 * @param args      対象のメソッドパラメータを設定します.
 	 * @return Object 戻り値が返されます.
@@ -1827,13 +1824,13 @@ s	 * @param name       対象のフィールド名を設定します.
 	 * 
 	 * @param loader    対象のクラスローダーを設定します.
 	 * @param clazzName 対象のクラス名を設定します.
-	 * @param target    設定対象のオブジェクトを設定します.
-	 *                  [null]の場合、staticアクセスで処理します.
+	 * @param target    設定対象のオブジェクトを設定します. [null]の場合、staticアクセスで処理します.
 	 * @param name      対象のメソッド名を設定します.
 	 * @param args      対象のメソッドパラメータを設定します.
 	 * @return Object 戻り値が返されます.
 	 */
-	public static final Object invoke(ClassLoader loader, String clazzName, Object target, String name, Object... args) {
+	public static final Object invoke(ClassLoader loader, String clazzName, Object target, String name,
+			Object... args) {
 		ClassElement em = FACTORY.getClass(loader, clazzName(clazzName, target));
 		if (em == null) {
 			throw new FastReflectException("Specified class does not exist.");
@@ -1857,8 +1854,7 @@ s	 * @param name       対象のフィールド名を設定します.
 	 * メソッド呼び出し.
 	 * 
 	 * @param clazz  対象のクラスを設定します.
-	 * @param target 設定対象のオブジェクトを設定します.
-	 *               [null]の場合、staticアクセスで処理します.
+	 * @param target 設定対象のオブジェクトを設定します. [null]の場合、staticアクセスで処理します.
 	 * @param name   対象のメソッド名を設定します.
 	 * @param args   対象のメソッドパラメータを設定します.
 	 * @return Object 戻り値が返されます.
@@ -1872,8 +1868,7 @@ s	 * @param name       対象のフィールド名を設定します.
 	 * 
 	 * @param loader 対象のクラスローダーを設定します.
 	 * @param clazz  対象のクラスを設定します.
-	 * @param target 設定対象のオブジェクトを設定します.
-	 *               [null]の場合、staticアクセスで処理します.
+	 * @param target 設定対象のオブジェクトを設定します. [null]の場合、staticアクセスで処理します.
 	 * @param name   対象のメソッド名を設定します.
 	 * @param args   対象のメソッドパラメータを設定します.
 	 * @return Object 戻り値が返されます.
@@ -1903,14 +1898,14 @@ s	 * @param name       対象のフィールド名を設定します.
 	 * 
 	 * @param loader    対象のクラスローダーを設定します.
 	 * @param clazzName 対象のクラス名を設定します.
-	 * @param target    設定対象のオブジェクトを設定します.
-	 *                  [null]の場合、staticアクセスで処理します.
+	 * @param target    設定対象のオブジェクトを設定します. [null]の場合、staticアクセスで処理します.
 	 * @param name      対象のメソッド名を設定します.
 	 * @param args      対象のメソッドパラメータを設定します.
 	 * @param types     対象のメソッドパラメータタイプを設定します.
 	 * @return Object 戻り値が返されます.
 	 */
-	public static final Object invokeTo(ClassLoader loader, String clazzName, Object target, String name, Object[] args, Class[] types) {
+	public static final Object invokeTo(ClassLoader loader, String clazzName, Object target, String name, Object[] args,
+			Class[] types) {
 		ClassElement em = FACTORY.getClass(loader, clazzName(clazzName, target));
 		if (em == null) {
 			throw new FastReflectException("Specified class does not exist.");
@@ -1939,14 +1934,14 @@ s	 * @param name       対象のフィールド名を設定します.
 	 * 
 	 * @param loader 対象のクラスローダーを設定します.
 	 * @param clazz  対象のクラスを設定します.
-	 * @param target 設定対象のオブジェクトを設定します.
-	 *               [null]の場合、staticアクセスで処理します.
+	 * @param target 設定対象のオブジェクトを設定します. [null]の場合、staticアクセスで処理します.
 	 * @param name   対象のメソッド名を設定します.
 	 * @param args   対象のメソッドパラメータを設定します.
 	 * @param types  対象のメソッドパラメータタイプを設定します.
 	 * @return Object 戻り値が返されます.
 	 */
-	public static final Object invokeTo(ClassLoader loader, Class clazz, Object target, String name, Object[] args, Class[] types) {
+	public static final Object invokeTo(ClassLoader loader, Class clazz, Object target, String name, Object[] args,
+			Class[] types) {
 		ClassElement em = FACTORY.getClass(loader, clazzName(clazz, target));
 		if (em == null) {
 			throw new FastReflectException("Specified class does not exist.");

@@ -7,7 +7,6 @@ import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -526,7 +525,7 @@ public final class SerializableCore {
 		// その他変換コードが設定されている場合.
 		if(ORIGIN_CODE != null) {
 			// オブジェクト変換.
-			o = ORIGIN_CODE.convert(o);
+			o = ORIGIN_CODE.inObject(o);
 			
 			// その他変換コードが設定されている場合.
 			if(ORIGIN_CODE.encode(strSeqMap, buf, o)) {
@@ -588,16 +587,11 @@ public final class SerializableCore {
 				byte1(buf, 2);
 			} else if (o instanceof java.sql.Timestamp) {
 				byte1(buf, 3);
-			} else if ("java.util.Date".equals(o.getClass().getName())) {
+			} else {
+				// java.util.Date.
 				byte1(buf, 4);
 			}
-			// 他日付オブジェクトの場合.
-			else {
-				byte1(buf, 5);
-				// オブジェクト名をセット.
-				stringBinary(strSeqMap, buf, o.getClass().getName());
-			}
-			byte8(buf, ((Date) o).getTime());
+			byte8(buf, ((java.util.Date) o).getTime());
 		} else if (o instanceof SerializeObject) {
 			head(buf, 15); // SerializeObject.
 			// オブジェクト名をセット.
@@ -741,8 +735,17 @@ public final class SerializableCore {
 	 * @param length 対象の長さを設定します.
 	 * @return Object 変換されたオブジェクトが返却されます.
 	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public static final Object decodeObject(String[] stringMap, int[] pos, byte[] b, int length) throws Exception {
+		Object ret = _decodeObject(stringMap, pos, b, length);
+		if(ORIGIN_CODE != null) {
+			return ORIGIN_CODE.outObject(ret);
+		}
+		return ret;
+	}
+	
+	// オブジェクト解析.
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	private static final Object _decodeObject(String[] stringMap, int[] pos, byte[] b, int length) throws Exception {
 		if (length <= pos[0]) {
 			throw new IOException("Attempting to process beyond specified length " + length + " byte: " + pos[0]);
 		}
@@ -807,20 +810,15 @@ public final class SerializableCore {
 			// Date.
 			final int type = byte1Int(b, pos);
 			if (type == 1) {
-				ret = new java.sql.Date(byte8Long(b, pos));
+				return new java.sql.Date(byte8Long(b, pos));
 			} else if (type == 2) {
-				ret = new java.sql.Time(byte8Long(b, pos));
+				return new java.sql.Time(byte8Long(b, pos));
 			} else if (type == 3) {
-				ret = new java.sql.Timestamp(byte8Long(b, pos));
+				return new java.sql.Timestamp(byte8Long(b, pos));
 			} else if (type == 4) {
-				ret = new java.util.Date(byte8Long(b, pos));
-			} else {
-				// 他オブジェクトの場合はオブジェクトを生成して処理.
-				final String cls = byteString(stringMap, pos, b);
-				ret = FastReflect.newInstance(cls);
-				((java.util.Date) ret).setTime(byte8Long(b, pos));
+				return new java.util.Date(byte8Long(b, pos));
 			}
-			return ret;
+			return null;
 		}
 		case 15: {
 			// SerializeObject.
@@ -957,7 +955,7 @@ public final class SerializableCore {
 		
 		// その他変換コードが設定されている場合.
 		if(ORIGIN_CODE != null && code >= SerializableOriginCode.USE_OBJECT_CODE) {
-			ret = ORIGIN_CODE.decode(stringMap, pos, b, length);
+			ret = ORIGIN_CODE.decode(stringMap, code, pos, b, length);
 			if(ret != null) {
 				return ret;
 			}
@@ -988,12 +986,26 @@ public final class SerializableCore {
 		protected static final int USE_OBJECT_CODE = 100;
 		
 		/**
-		 * オブジェクトの変換.
+		 * 入力オブジェクトの変換.
+		 * SerializableCore.encodeObject で処理される毎に、この処理が呼ばれます.
+		 * 
 		 * @param o オブジェクトを設定します.
 		 * @return Object 変換されたオブジェクトが返却されます.
 		 * @exception Exception 例外.
 		 */
-		public Object convert(Object o) throws Exception {
+		public Object inObject(Object o) throws Exception {
+			return o;
+		}
+		
+		/**
+		 * 出力オブジェクトの変換.
+		 * SerializableCore.decodeObject で処理結果毎に、この処理が呼ばれます.
+		 * 
+		 * @param o オブジェクトを設定します.
+		 * @return Object 変換されたオブジェクトが返却されます.
+		 * @exception Exception 例外.
+		 */
+		public Object outObject(Object o) throws Exception {
 			return o;
 		}
 		
@@ -1024,23 +1036,24 @@ public final class SerializableCore {
 		/**
 		 * バイナリをオブジェクトに変換.
 		 * 
-		 * @param stringMap シーケンス番号の文字列変換用情報を設定します.
-		 *                  文字列をデコードする場合に decodeString メソッドの引数に渡して利用します.
-		 * @param pos       対象のポジションを設定します.
-		 * @param b         対象のバイナリを設定します.
-		 * @param length    対象の長さを設定します.
-		 * @return Object   変換されたオブジェクトが返却されます.
+		 * @param stringMap  シーケンス番号の文字列変換用情報を設定します.
+		 *                   文字列をデコードする場合に decodeString メソッドの引数に渡して利用します.
+		 * @param objectCode オブジェクトコードが設定されます.
+		 * @param pos        対象のポジションを設定します.
+		 * @param b          対象のバイナリを設定します.
+		 * @param length     対象の長さを設定します.
+		 * @return Object    変換されたオブジェクトが返却されます.
 		 * @exception Exception 例外.
 		 */
-		public abstract Object decode(String[] stringMap, int[] pos, byte[] b, int length) throws Exception;
+		public abstract Object decode(String[] stringMap, int objectCode, int[] pos, byte[] b, int length) throws Exception;
 		
 		/**
 		 * 文字列をデコードする場合に利用.
 		 * 
-		 * @param stringMap シーケンス番号の文字列変換用情報を設定します.
-		 * @param pos       対象のポジションを設定します.
-		 * @param b         対象のバイナリを設定します.
-		 * @return String   対象の情報が返却されます.
+		 * @param stringMap  シーケンス番号の文字列変換用情報を設定します.
+		 * @param pos        対象のポジションを設定します.
+		 * @param b          対象のバイナリを設定します.
+		 * @return String    対象の情報が返却されます.
 		 */
 		public final String decodeString(String[] stringMap, int[] pos, byte[] b) throws Exception {
 			return SerializableCore.byteString(stringMap, pos, b);
@@ -1050,7 +1063,7 @@ public final class SerializableCore {
 		 * 当てはまらない条件のデコード返却.
 		 * デコード対象のオブジェクトコードの場合は、この処理を呼び出します.
 		 * 
-		 * @param objectCode
+		 * @param objectCode オブジェクトコードが設定されます.
 		 */
 		public void noneDecode(int objectCode) throws Exception {
 			throw new IOException("Unknown type '" + objectCode + "' detected.");

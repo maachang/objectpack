@@ -138,7 +138,7 @@ public final class ByteArrayIO extends OutputStream {
 	public void write(int b) throws IOException {
 
 		if (closeFlag) {
-			throw new IOException("既にクローズされています");
+			throw new IOException("Already closed.");
 		}
 
 		// 書き込みバッファがいっぱいの場合.
@@ -176,7 +176,7 @@ public final class ByteArrayIO extends OutputStream {
 	public void write(byte[] bin, int off, int len) throws IOException {
 
 		if (closeFlag) {
-			throw new IOException("既にクローズされています");
+			throw new IOException("Already closed.");
 		} else if (len <= 0) {
 			return;
 		}
@@ -224,7 +224,7 @@ public final class ByteArrayIO extends OutputStream {
 	public void write(ByteBuffer buf) throws IOException {
 
 		if (closeFlag) {
-			throw new IOException("既にクローズされています");
+			throw new IOException("Already closed.");
 		}
 
 		int len = buf.remaining();

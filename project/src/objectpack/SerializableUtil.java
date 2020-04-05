@@ -21,7 +21,7 @@ public final class SerializableUtil {
 	 */
 	public static final byte[] toBinary(Serializable value) throws Exception {
 		if (value == null) {
-			throw new IllegalArgumentException("引数は不正です");
+			throw new IllegalArgumentException("Argument is invalid.");
 		}
 		byte[] ret = null;
 		ObjectOutputStream o = null;
@@ -64,7 +64,7 @@ public final class SerializableUtil {
 	 */
 	public static final Serializable toObject(boolean mode, byte[] bin) throws Exception {
 		if (bin == null || bin.length <= 0) {
-			throw new IllegalArgumentException("引数は不正です");
+			throw new IllegalArgumentException("Argument is invalid.");
 		}
 		if (mode) {
 			JSnappyBuffer buf = JSnappy.decompress(bin);
@@ -84,7 +84,7 @@ public final class SerializableUtil {
 	 */
 	public static final Serializable toObject(byte[] bin, int off, int len) throws Exception {
 		if (bin == null || bin.length <= 0) {
-			throw new IllegalArgumentException("引数は不正です");
+			throw new IllegalArgumentException("Argument is invalid.");
 		}
 		ObjectInputStream in = null;
 		Serializable ret = null;

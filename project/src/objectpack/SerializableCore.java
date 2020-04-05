@@ -302,7 +302,7 @@ public final class SerializableCore {
 				return ((b[o + 1] & 0xff) << 24) | ((b[o + 2] & 0xff) << 16) | ((b[o + 3] & 0xff) << 8)
 						| (b[o + 4] & 0xff);
 			}
-			throw new IllegalArgumentException("不正なbyte4Int条件:" + off[0]);
+			throw new IllegalArgumentException("Invalid byte 4 int condition: " + off[0]);
 		}
 		// ヘッダ2ビットが混在定義の場合.
 		switch (((b[o] & 0xc0) >> 6) + 1) {
@@ -319,7 +319,7 @@ public final class SerializableCore {
 			off[0] += 4;
 			return ((b[o] & 0x3f) << 24) | ((b[o + 1] & 0xff) << 16) | ((b[o + 2] & 0xff) << 8) | (b[o + 3] & 0xff);
 		}
-		throw new IllegalArgumentException("不正なbyte4Int条件:" + off[0]);
+		throw new IllegalArgumentException("Invalid byte 4 int condition: " + off[0]);
 	}
 
 	/** 8バイト数値変換. **/
@@ -360,7 +360,7 @@ public final class SerializableCore {
 						| ((b[o + 4] & 0xffL) << 32L) | ((b[o + 5] & 0xffL) << 24L) | ((b[o + 6] & 0xffL) << 16L)
 						| ((b[o + 7] & 0xffL) << 8L) | (b[o + 8] & 0xffL));
 			}
-			throw new IllegalArgumentException("不正なbyte8Long条件:" + off[0]);
+			throw new IllegalArgumentException("Invalid byte 8 long condition: " + off[0]);
 		}
 		// ヘッダ3ビットが混在定義の場合.
 		switch (((b[o] & 0xe0) >> 5) + 1) {
@@ -396,7 +396,7 @@ public final class SerializableCore {
 					| ((b[o + 3] & 0xffL) << 32L) | ((b[o + 4] & 0xffL) << 24L) | ((b[o + 5] & 0xffL) << 16L)
 					| ((b[o + 6] & 0xffL) << 8L) | (b[o + 7] & 0xffL));
 		}
-		throw new IllegalArgumentException("不正なbyte8Long条件:" + off[0]);
+		throw new IllegalArgumentException("Invalid byte 8 long condition: " + off[0]);
 	}
 
 	/**
@@ -723,7 +723,7 @@ public final class SerializableCore {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	protected static final Object decodeObject(String[] stringMap, int[] pos, byte[] b, int length) throws Exception {
 		if (length <= pos[0]) {
-			throw new IOException("指定長[" + length + "byte]を越えて、処理を行おうとしています:" + pos[0]);
+			throw new IOException("Attempting to process beyond specified length " + length + " byte: " + pos[0]);
 		}
 
 		int i, len;
@@ -944,7 +944,7 @@ public final class SerializableCore {
 			return null;
 		}
 		}
-		throw new IOException("不明なタイプ[" + code + "]を検出しました");
+		throw new IOException("Unknown type '" + code + "' detected.");
 	}
 
 	/** ヘッダ文字セット. **/

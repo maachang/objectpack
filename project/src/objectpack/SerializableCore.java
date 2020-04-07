@@ -51,7 +51,8 @@ public final class SerializableCore {
 	public static final byte[] encode(Object o) throws Exception {
 		return encode(null, o);
 	}
-
+	
+	private static final byte[] ZERO4_BIN = new byte[] { (byte) 0, (byte) 0, (byte) 0, (byte) 0 };
 	/**
 	 * オブジェクトをバイナリに変換.
 	 *
@@ -68,7 +69,7 @@ public final class SerializableCore {
 		Map<String, Integer> stringCode = new AndroidMap<>();
 
 		// 文字情報集約先の書き込み処理(4).
-		buf.write(new byte[] { (byte) 0, (byte) 0, (byte) 0, (byte) 0 });
+		buf.write(ZERO4_BIN);
 
 		// オブジェクト変換(4+n).
 		encodeObject(stringCode, buf, o);
@@ -84,7 +85,7 @@ public final class SerializableCore {
 		buf.clear();
 
 		// 先頭に文字情報集約先のアドレスをセット.
-		b[0] = (byte) (endPoint & 0x000000ff);
+		b[0] = (byte) (endPoint  & 0x000000ff);
 		b[1] = (byte) ((endPoint & 0x0000ff00) >> 8);
 		b[2] = (byte) ((endPoint & 0x00ff0000) >> 16);
 		b[3] = (byte) ((endPoint & 0xff000000) >> 24);
@@ -133,8 +134,11 @@ public final class SerializableCore {
 		// 文字情報集約先の位置情報を取得.
 		// endpoint = 4 + n.
 		// n = body : 4 = head.
-		int endPoint = (int) ((b[pos] & 0x000000ff) | ((b[pos + 1] & 0x000000ff) << 8)
-				| ((b[pos + 2] & 0x000000ff) << 16) | ((b[pos + 3] & 0x000000ff) << 24));
+		int endPoint = (int) (
+			(b[pos] &      0x000000ff) |
+			((b[pos + 1] & 0x000000ff) << 8) |
+			((b[pos + 2] & 0x000000ff) << 16) |
+			((b[pos + 3] & 0x000000ff) << 24));
 
 		// 文字情報集約先の情報を取得.
 		p[0] = endPoint;

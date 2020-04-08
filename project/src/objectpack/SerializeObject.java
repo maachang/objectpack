@@ -1,29 +1,25 @@
 package objectpack;
 
-import java.io.OutputStream;
-
 /**
  * バイナリ変換用オブジェクト. このオブジェクトを継承して、所定のメソッド実装した場合、
- * SerializeConverterでのオブジェクトバイナリ化において、 処理速度や容量がSerializableよりも少なくなります.
+ * SerialzableCoreでのオブジェクトバイナリ化において、 処理速度や容量がSerializableよりも少なくなります.
  */
 public interface SerializeObject {
 
 	/**
-	 * バイナリ出力. この処理は、SerializeConverterのencodeBinaryメソッドから 呼び出されます.
+	 * シリアライズ処理.
 	 * 
-	 * @param buf バイナリを格納するバッファ.
+	 * @return Object[] シリアライズするためのオブジェクト配列を設定します.
 	 * @exception Exception 例外.
 	 */
-	public void toBinary(OutputStream buf) throws Exception;
+	public Object[] toSerialize() throws Exception;
 
 	/**
-	 * バイナリ入力.
+	 * シリアライズされたオブジェクト復元.
 	 * 
-	 * @param binary 対象のバイナリが設定されます.
-	 * @param offset 対象のオフセット値が設定されます.
-	 * @return int この処理で利用したバイナリオフセット値を返却します.
+	 * @param values toSerializeで返却した内容が設定されます.
 	 * @exception Exception 例外.
 	 */
-	public int toObject(byte[] binary, int offset) throws Exception;
+	public void toObject(Object[] values) throws Exception;
 
 }

@@ -609,7 +609,13 @@ public final class SerializableCore {
 			// オブジェクト名をセット.
 			stringBinary(strSeqMap, buf, o.getClass().getName());
 			// バイナリ変換.
-			((SerializeObject) o).toBinary(buf);
+			Object[] lst = ((SerializeObject) o).toSerialize();
+			// 配列データセット.
+			final int len = lst.length;
+			byte4(buf, len); // 長さ.
+			for (int i = 0; i < len; i++) {
+				encodeObject(strSeqMap, buf, lst[i]);
+			}
 		} else if (o.getClass().isArray()) {
 			if (o instanceof boolean[]) {
 				head(buf, 20); // boolean配列.
@@ -836,7 +842,12 @@ public final class SerializableCore {
 			// SerializeObject.
 			final String cls = byteString(stringMap, pos, b);
 			ret = FastReflect.newInstance(cls);
-			pos[0] = ((SerializeObject) ret).toObject(b, pos[0]);
+			len = byte4Int(b, pos);
+			final Object[] lst = new Object[len];
+			for (i = 0; i < len; i++) {
+				lst[i] = decodeObject(stringMap, pos, b, length);
+			}
+			((SerializeObject) ret).toObject(lst);
 			return ret;
 		}
 		case 20: {
@@ -942,7 +953,8 @@ public final class SerializableCore {
 			len = byte4Int(b, pos);
 			final Map map = new AndroidMap();
 			for (i = 0; i < len; i++) {
-				map.put(decodeObject(stringMap, pos, b, length), decodeObject(stringMap, pos, b, length));
+				map.put(decodeObject(stringMap, pos, b, length),
+						decodeObject(stringMap, pos, b, length));
 			}
 			return map;
 		}

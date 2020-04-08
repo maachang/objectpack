@@ -8,12 +8,9 @@ import java.nio.ByteBuffer;
  * バイナリバッファ.
  */
 public final class ByteArrayIO extends OutputStream {
-
-	/** デフォルトデータ長. **/
 	private static final int MIN_LENGTH = 256;
 	private static final int DEF_LENGTH = 512;
 
-	/** Link情報. **/
 	private final class BByteLinked {
 		byte[] value;
 		BByteLinked next;
@@ -51,7 +48,8 @@ public final class ByteArrayIO extends OutputStream {
 	/**
 	 * コンストラクタ.
 	 * 
-	 * @param closeToClean [true]を設定した場合、クローズ処理時に情報も破棄します.
+	 * @param closeToClean
+	 *            [true]を設定した場合、クローズ処理時に情報も破棄します.
 	 */
 	public ByteArrayIO(boolean closeToClean) {
 		this(DEF_LENGTH, closeToClean);
@@ -60,7 +58,8 @@ public final class ByteArrayIO extends OutputStream {
 	/**
 	 * コンストラクタ.
 	 * 
-	 * @param size 対象の１データのバッファ長を設定します.
+	 * @param size
+	 *            対象の１データのバッファ長を設定します.
 	 */
 	public ByteArrayIO(int size) {
 		this(size, false);
@@ -69,8 +68,10 @@ public final class ByteArrayIO extends OutputStream {
 	/**
 	 * コンストラクタ.
 	 * 
-	 * @param size         対象の１データのバッファ長を設定します.
-	 * @param closeToClean [true]を設定した場合、クローズ処理時に情報も破棄します.
+	 * @param size
+	 *            対象の１データのバッファ長を設定します.
+	 * @param closeToClean
+	 *            [true]を設定した場合、クローズ処理時に情報も破棄します.
 	 */
 	public ByteArrayIO(int size, boolean closeToClean) {
 		if (size <= MIN_LENGTH) {
@@ -81,9 +82,7 @@ public final class ByteArrayIO extends OutputStream {
 		last = new BByteLinked();
 		last.value = new byte[maxBuffer];
 		last.next = null;
-
 		first = last;
-
 		useLength = 0;
 		limit = 0;
 		position = 0;
@@ -105,7 +104,8 @@ public final class ByteArrayIO extends OutputStream {
 	/**
 	 * 情報クローズ.
 	 * 
-	 * @exception IOException 例外.
+	 * @exception IOException
+	 *                例外.
 	 */
 	public void close() throws IOException {
 		closeFlag = true;
@@ -123,7 +123,8 @@ public final class ByteArrayIO extends OutputStream {
 	/**
 	 * フラッシュ.
 	 * 
-	 * @exception IOException 例外.
+	 * @exception IOException
+	 *                例外.
 	 */
 	public void flush() throws IOException {
 		// なし.
@@ -132,18 +133,18 @@ public final class ByteArrayIO extends OutputStream {
 	/**
 	 * データセット.
 	 * 
-	 * @param b 対象のバイナリ情報を設定します.
-	 * @exception IOException 例外.
+	 * @param b
+	 *            対象のバイナリ情報を設定します.
+	 * @exception IOException
+	 *                例外.
 	 */
 	public void write(int b) throws IOException {
-
 		if (closeFlag) {
 			throw new IOException("Already closed.");
 		}
 
 		// 書き込みバッファがいっぱいの場合.
 		if (limit >= maxBuffer) {
-
 			// 新しい領域を作成.
 			last.next = new BByteLinked();
 			last = last.next;
@@ -158,8 +159,10 @@ public final class ByteArrayIO extends OutputStream {
 	/**
 	 * データセット.
 	 * 
-	 * @param bin 対象のバイナリを設定します.
-	 * @exception IOException 例外.
+	 * @param bin
+	 *            対象のバイナリを設定します.
+	 * @exception IOException
+	 *                例外.
 	 */
 	public void write(byte[] bin) throws IOException {
 		write(bin, 0, bin.length);
@@ -168,19 +171,21 @@ public final class ByteArrayIO extends OutputStream {
 	/**
 	 * データセット.
 	 * 
-	 * @param bin 対象のバイナリを設定します.
-	 * @param off 対象のオフセット値を設定します.
-	 * @param len 対象のデータ長を設定します.
-	 * @exception IOException 例外.
+	 * @param bin
+	 *            対象のバイナリを設定します.
+	 * @param off
+	 *            対象のオフセット値を設定します.
+	 * @param len
+	 *            対象のデータ長を設定します.
+	 * @exception IOException
+	 *                例外.
 	 */
 	public void write(byte[] bin, int off, int len) throws IOException {
-
 		if (closeFlag) {
 			throw new IOException("Already closed.");
 		} else if (len <= 0) {
 			return;
 		}
-
 		// 現在の書き込み位置を含む、1つのBByteLinked以上の情報長の場合.
 		if (len + limit > maxBuffer) {
 			int n;
@@ -193,12 +198,10 @@ public final class ByteArrayIO extends OutputStream {
 					limit += len;
 					return;
 				}
-
 				// バッファをオーバーする.
 				System.arraycopy(bin, off, last.value, limit, (n = maxBuffer - limit));
 				off += n;
 				len -= n;
-
 				// 新しい領域を作成.
 				last.next = new BByteLinked();
 				last = last.next;
@@ -218,20 +221,18 @@ public final class ByteArrayIO extends OutputStream {
 	/**
 	 * データセット.
 	 * 
-	 * @param 対象のByteBufferを設定します .
-	 * @exception IOException 例外.
+	 * @param 対象のByteBufferを設定します
+	 * @exception IOException
+	 *                例外.
 	 */
 	public void write(ByteBuffer buf) throws IOException {
-
 		if (closeFlag) {
 			throw new IOException("Already closed.");
 		}
-
 		int len = buf.remaining();
 		if (len <= 0) {
 			return;
 		}
-
 		// 現在の書き込み位置を含む、1つのBByteLinked以上の情報長の場合.
 		if (len + limit > maxBuffer) {
 			int n;
@@ -263,7 +264,6 @@ public final class ByteArrayIO extends OutputStream {
 			useLength += len;
 			limit += len;
 		}
-
 	}
 
 	/**
@@ -276,6 +276,8 @@ public final class ByteArrayIO extends OutputStream {
 	}
 
 	/**
+	 * 現在の書き込みバッファ長を取得.
+	 * 
 	 * @return int 書き込みバッファ長が返却されます.
 	 */
 	public int size() {
@@ -294,9 +296,11 @@ public final class ByteArrayIO extends OutputStream {
 	/**
 	 * 情報の参照取得. ※この処理では、参照取得されるだけで、ポジション移動はしません.
 	 * 
-	 * @param buf 対象のバッファ情報を設定します.
+	 * @param buf
+	 *            対象のバッファ情報を設定します.
 	 * @return int 取得された情報長が返却されます.
-	 * @exception IOException 例外.
+	 * @exception IOException
+	 *                例外.
 	 */
 	public int peek(byte[] buf) throws IOException {
 		return peek(buf, 0, buf.length);
@@ -305,11 +309,15 @@ public final class ByteArrayIO extends OutputStream {
 	/**
 	 * 情報の参照取得. ※この処理では、参照取得されるだけで、ポジション移動はしません.
 	 * 
-	 * @param buf 対象のバッファ情報を設定します.
-	 * @param off 対象のオフセット値を設定します.
-	 * @param len 対象の長さを設定します.
+	 * @param buf
+	 *            対象のバッファ情報を設定します.
+	 * @param off
+	 *            対象のオフセット値を設定します.
+	 * @param len
+	 *            対象の長さを設定します.
 	 * @return int 取得された情報長が返却されます.
-	 * @exception IOException 例外.
+	 * @exception IOException
+	 *                例外.
 	 */
 	public int peek(byte[] buf, int off, int len) throws IOException {
 		if (useLength == 0) {
@@ -355,9 +363,11 @@ public final class ByteArrayIO extends OutputStream {
 	/**
 	 * 情報の取得.
 	 * 
-	 * @param buf 対象のバッファ情報を設定します.
+	 * @param buf
+	 *            対象のバッファ情報を設定します.
 	 * @return int 取得された情報長が返却されます.
-	 * @exception IOException 例外.
+	 * @exception IOException
+	 *                例外.
 	 */
 	public int read(byte[] buf) throws IOException {
 		return read(buf, 0, buf.length);
@@ -366,11 +376,15 @@ public final class ByteArrayIO extends OutputStream {
 	/**
 	 * 情報の取得.
 	 * 
-	 * @param buf 対象のバッファ情報を設定します.
-	 * @param off 対象のオフセット値を設定します.
-	 * @param len 対象の長さを設定します.
+	 * @param buf
+	 *            対象のバッファ情報を設定します.
+	 * @param off
+	 *            対象のオフセット値を設定します.
+	 * @param len
+	 *            対象の長さを設定します.
 	 * @return int 取得された情報長が返却されます.
-	 * @exception IOException 例外.
+	 * @exception IOException
+	 *                例外.
 	 */
 	public int read(byte[] buf, int off, int len) throws IOException {
 		if (useLength == 0) {
@@ -386,7 +400,6 @@ public final class ByteArrayIO extends OutputStream {
 		}
 		int ret = len;
 		BByteLinked n = first;
-
 		if (position > 0) {
 			int tLen = maxBuffer - position;
 			if (len > tLen) {
@@ -422,7 +435,8 @@ public final class ByteArrayIO extends OutputStream {
 	/**
 	 * 情報の取得.
 	 * 
-	 * @param buf 対象のByteBufferを設定します.
+	 * @param buf
+	 *            対象のByteBufferを設定します.
 	 * @return int 取得された情報長が返却されます.
 	 */
 	public int read(ByteBuffer buf) throws Exception {
@@ -549,8 +563,10 @@ public final class ByteArrayIO extends OutputStream {
 	/**
 	 * 対象OutputStreamに、現在のデータを出力. データは全削除されます.
 	 * 
-	 * @param o 対象のOutputStreamを設定します.
-	 * @exception Exception 例外.
+	 * @param o
+	 *            対象のOutputStreamを設定します.
+	 * @exception Exception
+	 *                例外.
 	 */
 	public void outputStream(OutputStream o) throws Exception {
 		int len = (first == last) ? useLength : maxBuffer;
@@ -600,7 +616,8 @@ public final class ByteArrayIO extends OutputStream {
 	/**
 	 * 指定条件の位置を取得.
 	 * 
-	 * @param chk チェック対象のバイナリ情報を設定します.
+	 * @param chk
+	 *            チェック対象のバイナリ情報を設定します.
 	 * @return int 取得データ長が返却されます. [-1]の場合は情報は存在しません.
 	 */
 	public final int indexOf(final byte[] chk) {
@@ -657,8 +674,10 @@ public final class ByteArrayIO extends OutputStream {
 	/**
 	 * 指定条件の位置を取得.
 	 * 
-	 * @param chk チェック対象のバイナリ情報を設定します.
-	 * @param off 検索開始位置を設定します.
+	 * @param chk
+	 *            チェック対象のバイナリ情報を設定します.
+	 * @param off
+	 *            検索開始位置を設定します.
 	 * @return int 取得データ長が返却されます. [-1]の場合は情報は存在しません.
 	 */
 	public final int indexOf(final byte[] chk, int off) {
@@ -730,26 +749,27 @@ public final class ByteArrayIO extends OutputStream {
 	/**
 	 * 検索一致条件までの情報を取得.
 	 * 
-	 * @param buf 設定対象のバイナリ情報を設定します.
-	 * @param off 設定対象のオフセット値を設定します.
-	 * @param chk チェック対象のバイナリ情報を設定します.
+	 * @param buf
+	 *            設定対象のバイナリ情報を設定します.
+	 * @param off
+	 *            設定対象のオフセット値を設定します.
+	 * @param chk
+	 *            チェック対象のバイナリ情報を設定します.
 	 * @return int 取得データ長が返却されます. [-1]の場合は情報は存在しません.
 	 *         [-2]の場合は、情報が大きすぎて、設定対象のバイナリ情報に格納できません.
-	 * @exception Exception 例外.
+	 * @exception Exception
+	 *                例外.
 	 */
 	public final int search(final byte[] buf, int off, final byte[] chk) throws Exception {
-
 		BByteLinked nsrc;
 		byte[] nbin;
 		BByteLinked src = first;
 		byte[] bin = src.value;
 		int bLen = bin.length;
-
 		int p, pp, n, len, j, cLen;
 		p = position;
 		len = useLength;
 		cLen = chk.length;
-
 		if (cLen == 1) {
 			byte f = chk[0];
 			for (int i = 0; i < len; i++, p++) {
@@ -805,3 +825,4 @@ public final class ByteArrayIO extends OutputStream {
 	}
 
 }
+
